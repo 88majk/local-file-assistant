@@ -100,11 +100,7 @@ class LocalBielikLLM:
             )
         except GatedRepoError as exc:
             raise RuntimeError(
-                "Brak dostepu do gated modelu na Hugging Face. "
-                "1) Popros o dostep na stronie modelu. "
-                "2) Zaloguj sie: huggingface-cli login. "
-                "3) Albo ustaw zmienna srodowiskowa HF_TOKEN z tokenem. "
-                "4) Uruchom ponownie proces."
+                "Brak dostepu do gated modelu na Hugging Face."
             ) from exc
         return self.local_model_dir
 

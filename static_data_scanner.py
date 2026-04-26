@@ -21,7 +21,7 @@ try:
 except Exception:
     DocxDocument = None
 
-class FastIngestionScanner:
+class StaticDataScanner:
     def __init__(self, folder_path="data", max_workers=4):
         self.folder_path = folder_path
         self.db = MongoManager()
@@ -139,7 +139,8 @@ class FastIngestionScanner:
                 "summary": None,
                 "document_type": None,
                 "keywords": [],
-                "entities": {}
+                "entities": {},
+                "attributes": {}
             },
             "chunks": [
                 {"chunk_index": i, "content": c, "embedding": e} 
@@ -179,5 +180,5 @@ class FastIngestionScanner:
         print("\nZakończono etap 1: Pliki są gotowe do wektorowego wyszukiwania.")
 
 if __name__ == "__main__":
-    scanner = FastIngestionScanner()
+    scanner = StaticDataScanner()
     scanner.process_folder()

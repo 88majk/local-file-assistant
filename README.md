@@ -10,7 +10,7 @@ Obecna architektura:
 System ma umożliwiać lokalnego asystenta plików, który:
 - indeksuje dokumenty z katalogu `data/` (docelowo z dowolnie podanego katalogu),
 - zapisuje metadane, treść i embeddingi w MongoDB,
-- wzbogaca dokument o analizę językową (topic, summary, document_type, keywords, entities),
+- wzbogaca dokument o analizę językową i dynamiczne atrybuty key-value dopasowane do rodzaju pliku,
 - odpowiada na zapytania użytkownika przez hybrydowe wyszukiwanie (LLM + semantyka + filtry).
 
 ## Architektura (obecny stan)
@@ -74,7 +74,11 @@ Przykładowy dokument:
       "osoby": ["..."],
       "technologie": ["..."],
       "lokalizacje": ["..."]
-    }
+    },
+    "attributes": [
+      "źródło_faktury: Firma XYZ",
+      "typ_produktow: nawozy"
+    ]
   },
   "chunks": [
     {
