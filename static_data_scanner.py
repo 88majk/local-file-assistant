@@ -149,9 +149,25 @@ class StaticDataScanner:
         }
         return document_record
 
-    def process_folder(self):
+    def _emit_progress(self, callback, payload):
+        if callback is None:
+            return
+        try:
+            callback(payload)
+        except Exception:
+            # Progress callback errors should never stop ingestion.
+            pass
+
+    def process_folder(self, progress_callback=None):
         if not os.path.exists(self.folder_path): 
             print(f"Folder {self.folder_path} nie istnieje.")
+            self._emit_progress(progress_callback, {
+                "phase": "error",
+                "message": f"Folder {self.folder_path} nie istnieje.",
+                "processed": 0,
+                "total": 0,
+                "percent": 0,
+            })
             return
 
         files = [f for f in os.listdir(self.folder_path) if os.path.isfile(os.path.join(self.folder_path, f))]
@@ -163,21 +179,88 @@ class StaticDataScanner:
                 continue 
             to_process.append((filename, filepath))
 
+        skipped_existing = len(files) - len(to_process)
+
         if not to_process:
             print("Brak nowych plików do przetworzenia.")
+            self._emit_progress(progress_callback, {
+                "phase": "done",
+                "message": "Brak nowych plikow do przetworzenia.",
+                "processed": 0,
+                "total": 0,
+                "percent": 100,
+                "inserted": 0,
+                "failed": 0,
+                "skipped_existing": skipped_existing,
+            })
             self.db.close()
-            return
+            return {
+                "processed": 0,
+                "total": 0,
+                "inserted": 0,
+                "failed": 0,
+                "skipped_existing": skipped_existing,
+            }
+
+        total = len(to_process)
+        processed = 0
+        inserted = 0
+        failed = 0
+
+        self._emit_progress(progress_callback, {
+            "phase": "scanning",
+            "message": "Rozpoczynam skanowanie folderu.",
+            "processed": processed,
+            "total": total,
+            "percent": 0,
+            "current_file": None,
+        })
 
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             futures = {executor.submit(self._process_file, fn, fp): fn for fn, fp in to_process}
             for future in as_completed(futures):
+                filename = futures[future]
                 doc_record = future.result()
+                processed += 1
                 if doc_record:
                     self.db.collection.insert_one(doc_record)
+                    inserted += 1
                     print(f"Zapisano do bazy (bez AI): {doc_record['filename']}")
+                else:
+                    failed += 1
+
+                percent = int((processed / total) * 100) if total else 100
+                self._emit_progress(progress_callback, {
+                    "phase": "scanning",
+                    "message": f"Przetwarzanie: {filename}",
+                    "processed": processed,
+                    "total": total,
+                    "percent": percent,
+                    "current_file": filename,
+                    "inserted": inserted,
+                    "failed": failed,
+                    "skipped_existing": skipped_existing,
+                })
                 
         self.db.close()
         print("\nZakończono etap 1: Pliki są gotowe do wektorowego wyszukiwania.")
+        self._emit_progress(progress_callback, {
+            "phase": "done",
+            "message": "Skanowanie zakonczone.",
+            "processed": processed,
+            "total": total,
+            "percent": 100,
+            "inserted": inserted,
+            "failed": failed,
+            "skipped_existing": skipped_existing,
+        })
+        return {
+            "processed": processed,
+            "total": total,
+            "inserted": inserted,
+            "failed": failed,
+            "skipped_existing": skipped_existing,
+        }
 
 if __name__ == "__main__":
     scanner = StaticDataScanner()

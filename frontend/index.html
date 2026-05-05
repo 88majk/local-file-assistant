@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Local File Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/frontend/styles.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+
+    <div class="app-shell">
+      <aside class="panel left-panel">
+        <h1>Local File Assistant</h1>
+        <p class="subtitle">Lokalne przeszukiwanie semantyczne dokumentow.</p>
+
+        <label for="folderInput">Folder roboczy</label>
+        <div class="folder-row">
+          <input id="folderInput" type="text" placeholder="C:/sciezka/do/folderu" />
+          <div>
+            <button id="pickFolderBtn" class="btn ghost">Wybierz</button>
+            <button id="saveFolderBtn" class="btn ghost">Ustaw</button>
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <button id="scanBtn" class="btn primary">Skanuj folder</button>
+        </div>
+
+        <div class="status-card">
+          <div class="status-top">
+            <span>Status procesu</span>
+            <strong id="percentLabel">0%</strong>
+          </div>
+          <div class="progress-track">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+          <p id="statusMessage">Gotowe.</p>
+          <p id="docCounter" class="mono">Dokumenty: 0</p>
+        </div>
+      </aside>
+
+      <main class="panel center-panel">
+        <div class="center-tabs">
+          <button id="tabChatBtn" class="tab-btn active" type="button">Chat</button>
+          <button id="tabPreviewBtn" class="tab-btn" type="button">Podglad</button>
+        </div>
+
+        <section id="chatTabPanel" class="tab-panel active">
+          <div id="chatMessages" class="chat-messages"></div>
+
+          <form id="chatForm" class="chat-input-row">
+            <textarea
+              id="chatInput"
+              rows="3"
+              placeholder="Zadaj pytanie o dokumenty..."
+            ></textarea>
+            <button type="submit" class="btn primary">Wyslij</button>
+          </form>
+        </section>
+
+        <section id="previewTabPanel" class="tab-panel folder-tab-panel">
+          <div class="folder-files-header">
+            <h3>Pliki w podlaczonym folderze</h3>
+            <button id="refreshFilesBtn" class="btn ghost" type="button">Odswiez</button>
+          </div>
+          <p id="folderFilesInfo" class="preview-hint">-</p>
+          <ul id="folderFileList" class="folder-file-list"></ul>
+        </section>
+      </main>
+
+      <aside class="panel right-panel">
+        <h2>Podglad pliku</h2>
+        <p class="preview-hint">Wybierz plik z wynikow w dymku odpowiedzi AI.</p>
+
+        <section id="previewCard" class="preview-card hidden">
+          <h3 id="previewTitle">-</h3>
+          <p id="previewMeta" class="mono"></p>
+          <p id="previewSummary"></p>
+          <h4>Atrybuty</h4>
+          <ul id="previewAttrs"></ul>
+          <button id="openFileBtn" class="btn ghost">Otworz plik</button>
+        </section>
+      </aside>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="module" src="/frontend/app.js"></script>
+  </body>
+</html>

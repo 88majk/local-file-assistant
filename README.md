@@ -139,3 +139,71 @@ Aktualna implementacja obsługuje stały zestaw pól `ai_analysis`.
 Kierunek rozwoju:
 - wprowadzenie mechanizmu dynamicznych atrybutów generowanych na podstawie treści,
 - uczenie modelu ekstrakcji nowych par klucz-atrybut,
+
+## Frontend (etap startowy)
+
+Dodano pierwszy wariant warstwy frontendowej oparty o lokalne API FastAPI i SPA serwowane statycznie.
+
+Pliki:
+- `frontend_server.py` - API i serwowanie widoku
+- `frontend/index.html` - layout 3-panelowy (setup, chat, podglad)
+- `frontend/styles.css` - styl i responsywnosc
+- `frontend/app.js` - logika UI i komunikacja z API
+
+### Endpointy API
+- `GET /api/health`
+- `GET /api/folder`
+- `POST /api/folder`
+- `POST /api/scan`
+- `GET /api/status`
+- `POST /api/search`
+- `GET /api/document?filepath=...`
+- `POST /api/open-file`
+
+### Uruchomienie
+1. Zainstaluj zaleznosci:
+
+```bash
+pip install fastapi uvicorn
+```
+
+2. Uruchom serwer:
+
+```bash
+python frontend_server.py
+```
+
+3. Otworz w przegladarce:
+
+```text
+http://127.0.0.1:8000
+```
+
+Uwaga: aby wyszukiwanie semantyczne dzialalo w pelni, musi byc ustawiony `GOOGLE_AI_STUDIO_API_KEY` i uruchomione uslugi wymagane przez backend (MongoDB oraz Ollama).
+
+## Tryb desktop (osobne okno aplikacji)
+
+Frontend moze dzialac jako osobne okno systemowe (bez otwierania przegladarki) przez `pywebview`.
+
+Pliki:
+- `desktop_launcher.py` - launcher okienkowy, uruchamia serwer API i otwiera UI w natywnym oknie
+- `start_desktop.py` - prosty plik startowy
+- `start_desktop.bat` - start jednym dwuklikiem na Windows
+
+Instalacja zaleznosci:
+
+```bash
+pip install pywebview
+```
+
+Start:
+
+```bash
+python start_desktop.py
+```
+
+albo na Windows:
+
+```text
+start_desktop.bat
+```
